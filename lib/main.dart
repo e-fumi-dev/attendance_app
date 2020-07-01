@@ -1,5 +1,7 @@
 import 'package:attendanceapp/header.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void main() {
   runApp(MyApp());
@@ -25,8 +27,20 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  /*メーラー起動用設定
+  final Uri _emailLaunchUri = Uri(
+      scheme: 'mailto',
+      path: 'msfm0812@outlook.jp', //なにかローカルのファイルorＤＢに値を持っておく。（別画面で登録）
+      queryParameters: {
+        'subject': 'Example Subject & Symbols are allowed!',
+        'body': 'test'
+      });
+   */
+
   @override
   Widget build(BuildContext context) {
+    String subjectName = '';
+
     return Scaffold(
       appBar: Header(),
       body: Center(
@@ -44,34 +58,37 @@ class _MyHomePageState extends State<MyHomePage> {
                 autocorrect: false,
                 autofocus: true,
                 keyboardType: TextInputType.text,
+                onChanged: (text) {
+                  subjectName = text;
+                },
               ),
               Row(
                 children: <Widget>[
                   Expanded(
                     child: Container(
                       padding: EdgeInsets.all(10.0),
-                      child:
-                          _buttonArea(Icons.wb_sunny, '出勤', Colors.blueAccent),
+                      child: _buttonArea(
+                          Icons.wb_sunny, '出勤', Colors.blueAccent, subjectName),
                     ),
                   ),
                   Expanded(
                     child: Container(
                       padding: EdgeInsets.all(10.0),
-                      child: _buttonArea(
-                          Icons.directions_run, '退勤', Colors.redAccent),
+                      child: _buttonArea(Icons.directions_run, '退勤',
+                          Colors.redAccent, subjectName),
                     ),
                   ),
                 ],
               ),
               Container(
                 padding: EdgeInsets.all(10.0),
-                child: _buttonArea(
-                    Icons.free_breakfast, '休憩開始', Colors.lightGreen),
+                child: _buttonArea(Icons.free_breakfast, '休憩開始',
+                    Colors.lightGreen, subjectName),
               ),
               Container(
                 padding: EdgeInsets.all(10.0),
-                child: _buttonArea(
-                    Icons.free_breakfast, '休憩終了', Colors.lightGreen),
+                child: _buttonArea(Icons.free_breakfast, '休憩終了',
+                    Colors.lightGreen, subjectName),
               ),
             ],
           ),
@@ -80,7 +97,15 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _buttonArea(IconData icon, String label, Color color) {
+  // ボタン制御
+  // ボタン内の表示内容（アイコン、ラベル、ボタンカラー）
+  Widget _buttonArea(
+      IconData icon, String label, Color color, String subjectName) {
+    var email = 'test@example.com';
+    var subject = '【勤怠連絡】';
+    var body = '';
+    var url = '';
+
     return RaisedButton.icon(
       icon: Icon(icon),
       label: Text(
@@ -91,7 +116,12 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       color: color,
       textColor: Colors.white,
-      onPressed: () {},
+      onPressed: () {
+        subject = subject + subjectName;
+        body = label;
+        url = 'mailto:$email?subject=$subject&body=$body';
+        launch(url);
+      },
     );
   }
 }
