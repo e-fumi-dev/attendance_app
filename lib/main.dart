@@ -32,11 +32,12 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   Map<String, List<String>> _dropDownMenu = {
+    '': [],
     '野田太郎': [],
     '野田次郎': [],
     '野田三郎': []
   };
-  String dropdownValue = '野田太郎';
+  String dropdownValue = '';
 
   @override
   Widget build(BuildContext context) {
@@ -49,16 +50,20 @@ class _MyHomePageState extends State<MyHomePage> {
             return SingleChildScrollView(
               child: Center(
                 child: Container(
-                  padding: EdgeInsets.all(5),
+                  padding: EdgeInsets.all(15),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
                       DropdownButton<String>(
+                        isExpanded: true,
                         value: dropdownValue,
                         icon: Icon(Icons.arrow_downward),
                         iconSize: 30,
                         elevation: 16,
-                        style: TextStyle(fontSize: 30, color: Colors.black87),
+                        style: TextStyle(
+                          fontSize: 25,
+                          color: Colors.black87,
+                        ),
                         underline: Container(
                           height: 2,
                           color: Colors.black26,
@@ -66,6 +71,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         onChanged: (String newValue) {
                           setState(() {
                             dropdownValue = newValue;
+                            model.memberName = newValue;
                           });
                         },
                         items: _dropDownMenu.keys
@@ -76,23 +82,15 @@ class _MyHomePageState extends State<MyHomePage> {
                           );
                         }).toList(),
                       ),
-                      Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: Container(
-                              padding: EdgeInsets.all(10.0),
-                              child: _buttonArea(Icons.wb_sunny, '出勤',
-                                  Colors.blueAccent, dropdownValue),
-                            ),
-                          ),
-                          Expanded(
-                            child: Container(
-                              padding: EdgeInsets.all(10.0),
-                              child: _buttonArea(Icons.directions_run, '退勤',
-                                  Colors.redAccent, model.memberName),
-                            ),
-                          ),
-                        ],
+                      Container(
+                        padding: EdgeInsets.all(10.0),
+                        child: _buttonArea(Icons.wb_sunny, '出勤',
+                            Colors.blueAccent, dropdownValue),
+                      ),
+                      Container(
+                        padding: EdgeInsets.all(10.0),
+                        child: _buttonArea(Icons.directions_run, '退勤',
+                            Colors.redAccent, model.memberName),
                       ),
                       Container(
                         padding: EdgeInsets.all(10.0),
