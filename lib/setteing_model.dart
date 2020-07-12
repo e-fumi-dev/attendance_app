@@ -5,21 +5,18 @@ class SettingModel extends ChangeNotifier {
   String mailAddressTo = '';
   String mailAddressBcc = '';
 
-  void setMailAddressTo(String text) {
+  Future setMailAddressTo(String text) async {
     mailAddressTo = text;
-    notifyListeners();
+    //notifyListeners();
   }
 
-  void setMailAddressBcc(String text) {
+  Future setMailAddressBcc(String text) async {
     mailAddressBcc = text;
-    notifyListeners();
+    //notifyListeners();
   }
 
   Future setFileAddress() async {
     List<String> addressList = [];
-    if (mailAddressTo.isEmpty) {
-      throw ('宛先のメールアドレスを入力してください');
-    }
     SharedPreferences prefs = await SharedPreferences.getInstance();
     addressList.add(mailAddressTo);
     addressList.add(mailAddressBcc);

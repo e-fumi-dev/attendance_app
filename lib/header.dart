@@ -29,7 +29,7 @@ class Header extends StatelessWidget with PreferredSizeWidget {
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: IconButton(
-            icon: Icon(Icons.add),
+            icon: Icon(Icons.account_box),
             onPressed: () {
               Navigator.push(
                 context,

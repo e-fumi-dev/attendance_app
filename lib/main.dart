@@ -136,15 +136,28 @@ class _MyHomePageState extends State<MyHomePage> {
   // メーラー起動メソッド
   void funcOpenMailComposer(String label, String subjectName) async {
     List<String> addressList = [];
+    const String subject = '【勤怠連絡】';
+    var mailtoLink;
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
     addressList = prefs.getStringList("address");
 
-    final mailtoLink = Mailto(
-      to: [addressList[0].toString()],
-      cc: [addressList[1].toString()],
-      subject: '【勤怠連絡】' + subjectName,
-      body: label,
-    );
+    //宛先CCが含まれる場合
+    if (addressList[1].toString() != '') {
+      mailtoLink = Mailto(
+        to: [addressList[0].toString()],
+        cc: [addressList[1].toString()],
+        subject: subject + subjectName,
+        body: label,
+      );
+    } else {
+      mailtoLink = Mailto(
+        to: [addressList[0].toString()],
+        subject: subject + subjectName,
+        body: label,
+      );
+    }
+
     await launch('$mailtoLink');
   }
 }

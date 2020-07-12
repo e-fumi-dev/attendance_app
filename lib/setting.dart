@@ -1,4 +1,5 @@
 import 'package:attendanceapp/setteing_model.dart';
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -39,7 +40,6 @@ class SettingPage extends StatelessWidget {
                       ),
                       onChanged: (text) {
                         model.setMailAddressTo(text);
-                        //todo カーソルの制御の確認とバリデータ@が必要みたい。
                       },
                     ),
                     TextField(
@@ -56,7 +56,31 @@ class SettingPage extends StatelessWidget {
                     RaisedButton(
                       child: Text('メールアドレスを登録する'),
                       onPressed: () async {
-                        await model.setFileAddress();
+                        //TOの空チェック
+                        if (mailToTextEditingController.text != '') {
+                          //TOの形式チェック
+                          if (EmailValidator.validate(
+                              mailToTextEditingController.text)) {
+                            //CCの空チェック
+                            if (mailBccTextEditingController.text != '') {
+                              //CCの形式チェック
+                              if (EmailValidator.validate(
+                                  mailBccTextEditingController.text)) {
+                                await model.setFileAddress();
+                              } else {
+                                _showDialog(
+                                    context, '宛先（CC）はメールアドレス形式で入力してください。');
+                              }
+                            } else {
+                              //TOのみの場合、CCはからでも登録
+                              await model.setFileAddress();
+                            }
+                          } else {
+                            _showDialog(context, '宛先（TO）はメールアドレス形式で入力してください。');
+                          }
+                        } else {
+                          _showDialog(context, '宛先（TO）は必須です。');
+                        }
                       },
                     ),
                   ],
@@ -66,6 +90,28 @@ class SettingPage extends StatelessWidget {
           },
         ),
       ),
+    );
+  }
+
+  Future _showDialog(
+    BuildContext context,
+    String title,
+  ) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }
