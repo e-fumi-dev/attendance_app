@@ -6,11 +6,16 @@ class MemberListModel extends ChangeNotifier {
   var listItem = ["野田太郎", "野田次郎", "野田三郎"];
 
   Future readMemberList() async {
-    /*
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    memberList = prefs.getStringList("members");
-    */
-    memberList = listItem;
+    //memberList = prefs.getStringList("members");
+
+    if (prefs.getStringList("members") == null) {
+      memberList.add("社員を追加してください。");
+    } else {
+      memberList = prefs.getStringList("members");
+    }
+
+    //memberList = listItem;
     notifyListeners();
   }
 }
