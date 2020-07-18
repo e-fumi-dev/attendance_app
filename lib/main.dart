@@ -42,11 +42,12 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<MainModel>(
-      create: (_) => MainModel(),
+      create: (_) => MainModel()..readMemberList(),
       child: Scaffold(
         appBar: Header(),
         body: Consumer<MainModel>(
           builder: (context, model, child) {
+            final members = model.memberList;
             return SingleChildScrollView(
               child: Center(
                 child: Container(
@@ -74,8 +75,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             model.memberName = newValue;
                           });
                         },
-                        items: _dropDownMenu.keys
-                            .map<DropdownMenuItem<String>>((String value) {
+                        items: members.map((String value) {
                           return DropdownMenuItem<String>(
                             value: value,
                             child: Text(value),
@@ -84,23 +84,23 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                       Container(
                         padding: EdgeInsets.all(10.0),
-                        child: _buttonArea(Icons.wb_sunny, '出勤',
+                        child: _buttonArea(context, Icons.wb_sunny, '出勤',
                             Colors.blueAccent, dropdownValue),
                       ),
                       Container(
                         padding: EdgeInsets.all(10.0),
-                        child: _buttonArea(Icons.directions_run, '退勤',
+                        child: _buttonArea(context, Icons.directions_run, '退勤',
                             Colors.redAccent, model.memberName),
                       ),
                       Container(
                         padding: EdgeInsets.all(10.0),
-                        child: _buttonArea(Icons.free_breakfast, '休憩開始',
-                            Colors.lightGreen, model.memberName),
+                        child: _buttonArea(context, Icons.free_breakfast,
+                            '休憩開始', Colors.lightGreen, model.memberName),
                       ),
                       Container(
                         padding: EdgeInsets.all(10.0),
-                        child: _buttonArea(Icons.free_breakfast, '休憩終了',
-                            Colors.lightGreen, model.memberName),
+                        child: _buttonArea(context, Icons.free_breakfast,
+                            '休憩終了', Colors.lightGreen, model.memberName),
                       ),
                     ],
                   ),
@@ -115,8 +115,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // ボタン制御
   // ボタン内の表示内容（アイコン、ラベル、ボタンカラー）
-  Widget _buttonArea(
-      IconData icon, String label, Color color, String subjectName) {
+  Widget _buttonArea(BuildContext context, IconData icon, String label,
+      Color color, String subjectName) {
     return RaisedButton.icon(
       icon: Icon(icon),
       label: Text(
@@ -128,13 +128,14 @@ class _MyHomePageState extends State<MyHomePage> {
       color: color,
       textColor: Colors.white,
       onPressed: () {
-        funcOpenMailComposer(label, subjectName);
+        _funcOpenMailComposer(context, label, subjectName);
       },
     );
   }
 
   // メーラー起動メソッド
-  void funcOpenMailComposer(String label, String subjectName) async {
+  void _funcOpenMailComposer(
+      BuildContext context, String label, String subjectName) async {
     List<String> addressList = [];
     const String subject = '【勤怠連絡】';
     var mailtoLink;
@@ -142,22 +143,50 @@ class _MyHomePageState extends State<MyHomePage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     addressList = prefs.getStringList("address");
 
-    //宛先CCが含まれる場合
-    if (addressList[1].toString() != '') {
-      mailtoLink = Mailto(
-        to: [addressList[0].toString()],
-        cc: [addressList[1].toString()],
-        subject: subject + subjectName,
-        body: label,
-      );
+    //宛先が設定されていない場合
+    if (addressList != null || subjectName == '') {
+      //宛先CCが含まれる場合
+      if (addressList[1].toString() != '') {
+        print('1');
+        mailtoLink = Mailto(
+          to: [addressList[0].toString()],
+          cc: [addressList[1].toString()],
+          subject: subject + subjectName,
+          body: label,
+        );
+      } else {
+        print('2');
+        mailtoLink = Mailto(
+          to: [addressList[0].toString()],
+          subject: subject + subjectName,
+          body: label,
+        );
+      }
+      await launch('$mailtoLink');
     } else {
-      mailtoLink = Mailto(
-        to: [addressList[0].toString()],
-        subject: subject + subjectName,
-        body: label,
-      );
+      _showDialog(context, '宛先のメールアドレスを設定してください。');
     }
+  }
 
-    await launch('$mailtoLink');
+  Future _showDialog(
+    BuildContext context,
+    String title,
+  ) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }

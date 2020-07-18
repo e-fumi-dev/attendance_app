@@ -28,8 +28,10 @@ class SettingModel extends ChangeNotifier {
     List<String> addressList = [];
     SharedPreferences prefs = await SharedPreferences.getInstance();
     addressList = prefs.getStringList("address");
-    mailAddressTo = (addressList[0].toString() ?? '');
-    mailAddressBcc = (addressList[1].toString() ?? '');
+    if (addressList != null) {
+      mailAddressTo = (addressList[0].toString() ?? '');
+      mailAddressBcc = (addressList[1].toString() ?? '');
+    }
     notifyListeners();
   }
 }

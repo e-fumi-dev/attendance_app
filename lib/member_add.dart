@@ -26,12 +26,19 @@ class MemberAddPage extends StatelessWidget {
                       hintText: '野田太郎',
                       icon: Icon(Icons.account_box),
                     ),
-                    onChanged: (text) {},
+                    onChanged: (text) {
+                      model.memberName = text;
+                    },
                   ),
                   RaisedButton(
                     child: Text('社員を追加する'),
                     onPressed: () async {
-                      await AddMember(model, context);
+                      if (model.memberName != null) {
+                        await _addMember(model, context);
+                        await _showDialog(context, '社員を登録しました。');
+                      } else {
+                        await _showDialog(context, '社員名を入力してください');
+                      }
                     },
                   ),
                 ],
@@ -43,7 +50,29 @@ class MemberAddPage extends StatelessWidget {
     );
   }
 
-  Future AddMember(AddMemberModel model, BuildContext context) async {
+  Future _addMember(AddMemberModel model, BuildContext context) async {
     await model.addMemberFile();
+  }
+
+  Future _showDialog(
+    BuildContext context,
+    String title,
+  ) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }
