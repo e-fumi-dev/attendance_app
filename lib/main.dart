@@ -7,6 +7,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:mailto/mailto.dart';
 
+import 'member_list.dart';
+
 void main() {
   runApp(MyApp());
 }
@@ -31,12 +33,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  Map<String, List<String>> _dropDownMenu = {
-    '': [],
-    '野田太郎': [],
-    '野田次郎': [],
-    '野田三郎': []
-  };
   String dropdownValue = '';
 
   @override
@@ -47,7 +43,7 @@ class _MyHomePageState extends State<MyHomePage> {
         appBar: Header(),
         body: Consumer<MainModel>(
           builder: (context, model, child) {
-            final members = model.memberList;
+            var members = model.memberList;
             return SingleChildScrollView(
               child: Center(
                 child: Container(
@@ -81,6 +77,24 @@ class _MyHomePageState extends State<MyHomePage> {
                             child: Text(value),
                           );
                         }).toList(),
+                      ),
+                      Container(
+                        alignment: Alignment.centerRight,
+                        child: FloatingActionButton.extended(
+                          icon: Icon(Icons.account_box),
+                          label: Text('社員を登録する'),
+                          backgroundColor: Colors.grey,
+                          onPressed: () async {
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => MemberListPage(),
+                              ),
+                            );
+                            model.readMemberList();
+                            members = model.memberList;
+                          },
+                        ),
                       ),
                       Container(
                         padding: EdgeInsets.all(10.0),
@@ -168,7 +182,8 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  Future _showDialog(
+  //ダイアログ表示
+  _showDialog(
     BuildContext context,
     String title,
   ) {

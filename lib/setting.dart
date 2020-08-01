@@ -45,7 +45,7 @@ class SettingPage extends StatelessWidget {
                     TextField(
                       controller: mailBccTextEditingController,
                       decoration: InputDecoration(
-                        labelText: 'メールアドレス宛先（BCC）',
+                        labelText: 'メールアドレス宛先（CC）',
                         hintText: 'example@ex.co.jp',
                         icon: Icon(Icons.mail_outline),
                       ),
@@ -67,6 +67,7 @@ class SettingPage extends StatelessWidget {
                               if (EmailValidator.validate(
                                   mailBccTextEditingController.text)) {
                                 await model.setFileAddress();
+                                _showDialog(context, 'メールアドレスを登録しました。');
                               } else {
                                 _showDialog(
                                     context, '宛先（CC）はメールアドレス形式で入力してください。');
@@ -93,7 +94,7 @@ class SettingPage extends StatelessWidget {
     );
   }
 
-  Future _showDialog(
+  _showDialog(
     BuildContext context,
     String title,
   ) {

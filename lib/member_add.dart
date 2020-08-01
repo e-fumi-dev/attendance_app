@@ -54,7 +54,7 @@ class MemberAddPage extends StatelessWidget {
     await model.addMemberFile();
   }
 
-  Future _showDialog(
+  _showDialog(
     BuildContext context,
     String title,
   ) {

@@ -20,7 +20,7 @@ class MemberListPage extends StatelessWidget {
           body: Consumer<MemberListModel>(
             builder: (context, model, child) {
               final members = model.memberList;
-              return listDisplay(members);
+              return listDisplay(context, model, members);
             },
           ),
           floatingActionButton: Consumer<MemberListModel>(
@@ -46,45 +46,61 @@ class MemberListPage extends StatelessWidget {
   }
 
   //リストのContainerの0件or有件Widget
-  Widget listDisplay(var members) {
+  Widget listDisplay(BuildContext context, MemberListModel model, var members) {
     //リストが有件の場合
     if (members != null) {
-      return Container(
-        child: ListView(
-          children: <Widget>[
-            for (var item in members)
-              Container(
-                padding: EdgeInsets.all(5.0),
-                decoration: BoxDecoration(
-                  border: Border(
-                    left: BorderSide(
-                      width: 5,
-                      color: Colors.lightGreen,
+      if (model.memberList.length != 0) {
+        return Container(
+          child: ListView(
+            children: <Widget>[
+              for (var item in members)
+                Container(
+                  padding: EdgeInsets.all(5.0),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      left: BorderSide(
+                        width: 5,
+                        color: Colors.lightGreen,
+                      ),
+                      bottom: BorderSide(
+                        width: 1,
+                        color: Colors.black87,
+                      ),
                     ),
-                    bottom: BorderSide(
-                      width: 1,
-                      color: Colors.black87,
+                  ),
+                  child: ListTile(
+                    title: Text(
+                      item,
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
+                    ),
+                    trailing: IconButton(
+                      icon: Icon(Icons.delete),
+                      onPressed: () async {
+                        print(item);
+                        await deleteMember(context, model, item);
+                        await model.readMemberList();
+                      },
                     ),
                   ),
                 ),
-                child: ListTile(
-                  title: Text(
-                    item,
-                    style: TextStyle(
-                      fontSize: 18,
-                    ),
-                  ),
-                  trailing: IconButton(
-                    icon: Icon(Icons.edit),
-                    onPressed: () async {
-                      //TODO: deleteメソッド
-                    },
-                  ),
-                ),
-              ),
-          ],
-        ),
-      );
+            ],
+          ),
+        );
+      } else {
+        //リストが0件の場合
+        return Container(
+          child: Text(
+            '社員を1名以上登録してください。',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.red,
+            ),
+          ),
+        ); // Empty Container Widget
+      }
     } else {
       //リストが0件の場合
       return Container(
@@ -98,5 +114,38 @@ class MemberListPage extends StatelessWidget {
         ),
       ); // Empty Container Widget
     }
+  }
+
+  //メンバー削除
+  Future deleteMember(
+      BuildContext context, MemberListModel model, String memberName) async {
+    try {
+      await model.deleteMember(memberName);
+      _showDialog(context, '対象の社員を削除いたしました。');
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  _showDialog(
+    BuildContext context,
+    String title,
+  ) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }

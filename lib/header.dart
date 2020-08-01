@@ -1,6 +1,5 @@
-import 'package:attendanceapp/member_list.dart';
-import 'package:attendanceapp/setting.dart';
 import 'package:flutter/material.dart';
+import 'setting.dart';
 
 class Header extends StatelessWidget with PreferredSizeWidget {
   @override
@@ -13,8 +12,8 @@ class Header extends StatelessWidget with PreferredSizeWidget {
         padding: const EdgeInsets.all(8.0),
         child: IconButton(
           icon: Icon(Icons.settings),
-          onPressed: () {
-            Navigator.push(
+          onPressed: () async {
+            await Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => SettingPage()),
             );
@@ -25,20 +24,6 @@ class Header extends StatelessWidget with PreferredSizeWidget {
       backgroundColor: Colors.black87,
       centerTitle: true,
       elevation: 0.0,
-      actions: <Widget>[
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: IconButton(
-            icon: Icon(Icons.account_box),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => MemberListPage()),
-              );
-            },
-          ),
-        ),
-      ],
     );
   }
 }
